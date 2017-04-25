@@ -113,7 +113,7 @@ class GameScene: SKScene {
             zombie.position.y = topRight.y
             velocity.y = -velocity.y
         }
-        
     }
+    
     
 }
