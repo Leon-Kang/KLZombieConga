@@ -31,6 +31,10 @@ class GameScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
+        #if DEBUG
+            debugDrawPlayableArea()
+        #endif
+        
         backgroundColor = SKColor.black
         
         let background = SKSpriteNode(imageNamed: "background1")
@@ -52,6 +56,7 @@ class GameScene: SKScene {
         
         moveSprite(sprite: zombie, velocity: velocity)
         boundsCheckZombie()
+        rotateSprite(sprite: zombie, direction: velocity)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -94,8 +99,10 @@ class GameScene: SKScene {
     }
     
     func boundsCheckZombie() {
-        let bottomLeft = CGPoint(x: 0, y: 0)
-        let topRight = CGPoint(x: size.width, y: size.height)
+        let bottomLeft = CGPoint(x: 0,
+                                 y: playableRect.minY)
+        let topRight = CGPoint(x: size.width,
+                               y: playableRect.maxY)
         
         if zombie.position.x <= bottomLeft.x {
             zombie.position.x = bottomLeft.x
@@ -115,5 +122,19 @@ class GameScene: SKScene {
         }
     }
     
+    func debugDrawPlayableArea() {
+        let shape = SKShapeNode()
+        let path = CGMutablePath()
+        path.addRect(playableRect)
+        shape.path = path
+        shape.strokeColor = .red
+        shape.lineWidth = 4.0
+        addChild(shape)
+    }
+    
+    func rotateSprite(sprite: SKSpriteNode, direction: CGPoint) {
+        sprite.zPosition = CGFloat(atan2(Double(direction.y),
+                                         Double(direction.x)))
+    }
     
 }
