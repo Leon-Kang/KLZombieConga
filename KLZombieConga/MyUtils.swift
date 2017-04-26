@@ -68,6 +68,7 @@ func /= (point:inout CGPoint, scalar: CGFloat) {
     }
 #endif
 
+//MARK: CGPoint extenseion
 extension CGPoint {
     
     func length() -> CGFloat {
@@ -83,7 +84,17 @@ extension CGPoint {
     }
 }
 
-
+//MARK: CGFloat extension
+extension CGFloat {
+    static func random() -> CGFloat {
+        return CGFloat(Float(arc4random()) / Float(UInt32.max))
+    }
+    
+    static func random(min:CGFloat, max: CGFloat) -> CGFloat {
+        assert(min < max)
+        return CGFloat.random() * (max - min) + min
+    }
+}
 
 
 
