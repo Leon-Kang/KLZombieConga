@@ -24,6 +24,8 @@ class GameScene: SKScene {
     let zombieAnimation: SKAction
     let catCollisionSound: SKAction = SKAction.playSoundFileNamed("hitCat.wav", waitForCompletion: false)
     let enemyCollisionSound:SKAction = SKAction.playSoundFileNamed("hitCatLady.wav", waitForCompletion: false)
+    var lives = 5
+    var gameOver = false;
     
     // MARK: init
     override init(size: CGSize) {
@@ -255,4 +257,22 @@ class GameScene: SKScene {
         }
     }
     
+    func loseCats() {
+        var loseCount = 0
+        enumerateChildNodes(withName: "train") { (node, stop) in
+            var randomSpot = node.position
+            randomSpot.x += CGFloat.random(min: -100, max: 100)
+            randomSpot.y += CGFloat.random(min: -100, max: 100)
+            
+            node.name = ""
+            node.run(SKAction.sequence([SKAction.group([SKAction.rotate(byAngle: CGFloat.pi * 4, duration: 1.0),
+                                                        SKAction.move(to: randomSpot, duration: 1.0),
+                                                        SKAction.scale(to: 0, duration: 1.0)]),
+                                        SKAction.removeFromParent()]))
+            loseCount += 1
+            if loseCount >= 2 {
+                stop.pointee = false
+            }
+        }
+    }
 }
