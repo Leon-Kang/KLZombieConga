@@ -55,7 +55,7 @@ class GameScene: SKScene {
         #endif
         
         backgroundColor = SKColor.black
-        
+        playBackgroundMusic(filename: "backgroundMusic.mp3")
         let background = SKSpriteNode(imageNamed: "background1")
         background.position = CGPoint(x: size.width/2, y: size.height/2)
         addChild(background)
@@ -86,6 +86,16 @@ class GameScene: SKScene {
 //        rotateSprite(sprite: zombie, direction: velocity)
         
         stopZombieAnimation()
+        
+        if lives <= 0 && !gameOver {
+            gameOver = true
+            print("You lose!")
+            let gameOverScene = GameOverScene(size: size, won: false)
+            gameOverScene.scaleMode = scaleMode
+            let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
+            view?.presentScene(gameOverScene, transition: reveal)
+            backgroundMusicPlayer.stop()
+        }
     }
     
     override func didEvaluateActions() {
@@ -230,6 +240,8 @@ class GameScene: SKScene {
     func zombieHitEnemy(enemy: SKSpriteNode) {
         enemy.removeFromParent()
         run(enemyCollisionSound)
+        loseCats()
+        lives -= 1
     }
     
     func checkCollisions() {
@@ -254,6 +266,33 @@ class GameScene: SKScene {
         }
         for enemy in hitEnemies {
             zombieHitEnemy(enemy: enemy)
+        }
+    }
+    
+    func moveTrain() {
+        var targetPosition = zombie.position
+        var trainCount = 0
+        enumerateChildNodes(withName: "train") { (node, _) in
+            trainCount += 1
+            if !node.hasActions() {
+                let actionDuration = 0.3
+                let offset = targetPosition - node.position // a
+                let direction = offset.normalized() // b
+                let amountToMovePerSec = self.zombieMovePointPerSec * CGFloat(actionDuration) // c
+                let amountToMove = direction * amountToMovePerSec // d
+                let moveAction = SKAction.moveBy(x: amountToMove.x, y: amountToMove.y, duration: actionDuration) // e
+                node.run(moveAction)
+            }
+            targetPosition = node.position
+        }
+        if trainCount >= 15 && !gameOver {
+            gameOver = true
+            print("You win!")
+            let gameOverScene = GameOverScene(size: size, won: true)
+            gameOverScene.scaleMode = scaleMode
+            let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
+            view?.presentScene(gameOverScene, transition: reveal)
+            backgroundMusicPlayer.stop()
         }
     }
     
